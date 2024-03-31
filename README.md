@@ -65,7 +65,7 @@ Entonces un ejemplo real sería:
   CREATE DATABASE Usuarios;
 ```
 
-### Consulta, tabla, campo, valor de campo, registro, identificadores
+### Consulta, tabla, campo, valor de campo, registros
 
 - **Tabla | Table:** Una tabla es una estructura de datos que está compuesta por filas y columnas. *Por ejemplo:* Un ajedrez o la tabla periódica.
 Para crear una tabla en una base de datos usamos la siguiente declaración:
@@ -77,6 +77,17 @@ CREATE TABLE table_name (
 )
 ```
 El parámetro **columna | campo | field** especifica el nombre de la columna de la tabla. Y el parámetro _datatype_ especifica el tipo de dato que la columna va a manejar. Ejemplo: varchar, integer, date, etc. Más información sobre los [tipos de datos](https://www.w3schools.com/sql/sql_datatypes.asp) para los campos.
+
+EL siguiente ejemplo crea una tabla llamada **Persons** que contiene 5 columnas: PersonID, LastName, FirstName, Adders y City
+```sql
+CREATE TABLE Persons (
+    PersonID int,
+    LastName varchar(255),
+    Firstname varchar(255),
+    Address varchar(255),
+    City varchar(255)
+)
+```
 
 El **registro | record** de una tabla son las filas que la componen. Donde se almacena la información de cada columna.
 ![registro de una tabla](https://aprendelibvrefiles.blob.core.windows.net/aprendelibvre-container/course/access_2007/image/acces07_01_04_l.png)
@@ -133,12 +144,157 @@ Un ejemplo real sería así:
 ```sql
 DELETE FROM usuarios;
 ```
+
+> !Cuidado].
 Hay que tener **cuidado** porque al ejecutar este comando se borran **TODOS** los registros de una tabla, por eso esta sentencia se usa con la declaración **WHERE**
 
+## SECCIÓN BASICA
 
+### Identificadores
 
+Los identificadores son campos que nos permiten identificar un registro entero. Existen dos tipos de identificadores: los _primary keys | llaves primarias_ y los _foreing keys | llaves extranjeras_
 
+### Clave primaria (primary key)
+1. Una clave primaria es un campo (o combinación de campos) que identifica de manera única cada fila en una tabla.
+2. En una tabla, solo puede haber una clave primaria
+3. La clave primaria garantiza la integridad de los datos y evita que se ingresen filas duplicadas en la tabla.
+4. Se define al momento de crear la tabla usando la cláusula “PRIMARY KEY”
+5. Los valores en una clave primaria no pueden ser nulos (null)
 
+En el siguiente ejemplo se crea una tabla _employees_ con una primary key que se llama _employee_id_
 
+```sql
+    CREATE TABLE EMPLOYEES (
+        employee_id INT PRIMARY KEY,
+        last_name VARCHAR(50) NOT NULL,
+        first_name VARCHAR(50),
+        hire_date DATE,
+    )
+```
 
+Cuando se crean tablas es comun usar en su clave primaria la palabra clave **AUTO INCREMENT**, esto permite a la columna generar un numero automaticamente incrementable cada vez que una nueva fila es agregada a la tabla para hacer ese registro unico de todos los demas registros.
 
+```sql
+CREATE TABLE Persons (
+    PersonID int NOT NULL AUTO_INCREMENT,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMATY KEY (PersonID)
+)
+```
+
+Clave Foránea (Foreign key)
+1. Una clave foránea es un campo (o una combinación de campos) en una tabla que establece una relación con la clave primaria de otra tabla, es decir hace referencia a una clave primaria de otra tabla; es decir: no puede ser una clave foránea si no esta haciendo referencia a una clave primaria de otra tabla. **ES UNA BUENA PRACTICA A UNA COLUMNA QUE VA A CONTENER UNA CLAVE FORANEA PONERLE EL MISMO NOMBRE DE LA COLUMNA A LA QUE VAMOS A HACER REFERENCIA.**
+Ejemplo: Si en una tabla usuarios tenemos la columna *id_usuarios* que es una clave primaria, y en otra tabla vamos a tener una columna pacientes, que en realidad es una columna foránea que va a contener ids de los usuarios, entonces no le ponemos pacientes sino **id_usuarios.**
+2. Se utiliza para vincular dos tablas entre sí y garantizar la integridad referencial de los datos
+3. No necesariamente hay una única clave foránea en una tabla
+4. Los valores en una clave foránea pueden ser nulos, lo que indica que la relación es opcional.
+5. Se define usando la cláusula **FOREIGN KEY** al momento de crear la tabla.
+
+En el siguiente ejemplo se crea una tabla _Detalles_ con una primary key que se llama _id_ y la foreing key que se toma de la columna producto_id
+
+```sql
+CREATE TABLE Detalles (
+    id INT PRIMARY KEY,
+    producto_id INT,
+    cantidad INT,
+    FOREIGN KEY (producto_id) REFERENCES Productos(id)
+);
+```
+
+Ahora un ejemplo para que todo quede mas claro: tenemos dos tablas: una llamada _usuarios_ y otra que se llama _turnos_medicos_
+
+![turnosmediucos](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/turnosMedicos.jpg)
+
+Al momento de crear ambas tablas, las relacionamos por las foreign keys, que serian el **id_usuario**
+
+![tablas relacionadas](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/relacionTablas.jpg)
+Para hacer este diagrama usamos la herramienta [dbdiagram](https://dbdiagram.io/)
+Para generar esta imagen este fue el script usado
+```
+Project aprendiendo {
+  database_type: 'sql lite'
+  Note: 'Aprendiendo'
+}
+
+Table users {
+  id_usuario integer [primary key]
+  nombre varchar
+  apellido varchar
+  edad integer
+}
+
+Table turnos_medicos {
+  id_turno integer
+  profesional varchar
+  id_usuario integer [ref: - users.id_usuario]
+  motivo varchar
+  horario varchar
+}
+```
+
+## Base de datos Northwind
+
+Para obtener una base de datos para poder trabajar usamos [Northwind](Northwind: https://cutt.ly/s44VsfF)
+
+![northwind](https://upload.wikimedia.org/wikiversity/en/thumb/a/ac/Northwind_E-R_Diagram.png/1440px-Northwind_E-R_Diagram.png)
+
+**Analisis de la imagen**
+1. La **tabla Customers** esta relacionada con la **tabla Orders** por la clave primaria CustomerID: es decir que ordeno ese cliente
+2. La **tabla Employees** esta relacionada con la **tabla Orders** por su clave primaria EmployeeID: es decir cual empleado a vendido a que cliente  
+4. En la **tabla shippers** estan las empresas que se encargan del envio del producto, entonces; en esta tabla esta relacionada con la **tabla orders** por el SHipperID: es decir que empresa se encargo de despachar X orden de compra.
+5. La **tabla ordersDetails** esta relacionada con la **tabla orders** por medio de una clave foránea OrderID que hace referencia a la clave primaria de la tabla orders: orderID
+6. La **tabla Products** esta relacionada con la **tabla OrderDetails** por medio de una clave foranea ProductID que se relacionada con al clave primaria productID de la tabla products
+
+### Operaciones sobre los datos
+
+**Clausula AS**
+
+La clausula **AS** nos permite darle a ua tabla o a una columna un nombre temporal (sobrenombre). Los alias son usados para darle a las columnas nombres mas legibles.
+
+La sintaxis general es asi para una columna:
+```sql
+SELECT column_name AS alias_column_name FROM table_name;
+```
+la sintaxis general es asi para una tabla:
+```sql
+SELECT column_name(s) FROM table_name AS alias_table_name;
+```
+Un ejemplo mas seria asi:
+```sql
+SELECT LastName AS apellido from Employees;
+```
+
+**Clausula ORDER BY**
+
+La palabra clave **ORDER BY** nos permite ordenar el conjunto de resultados en un orden ascendente o descendente.
+
+La sintaxis es esta:
+```sql
+SELECT column1, column2, ...
+FROM table_name 
+ORDER BY column1, column2, ... ASC | DESC
+```
+
+Otros ejemplos:
+
+Este comando organiza la tabla por la columna Price desde el mas barato hasta el mas caro ascendentemente
+```sql
+SELECT * from Products ORDER BY Price ASC
+```
+Algunas veces va a pasar que los datos tienen valores NULL, si queremos mostrar los valores null al final escribimos la consulta agregandole la palabra clave **NULL LAST** despues del **ASC**
+```sql
+SELECT * FROM Products 
+ORDER BY ProductName ASC NULL LAST
+```
+
+**Clausula RANDOM**
+
+La clausula **RANDOM** ordena las columnas de una tabla al azar.
+
+```sql
+SELECT * FROM Products ORDEY BY random()
+```
+
+**Clausula DISTINCT**
