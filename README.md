@@ -6,6 +6,8 @@
 ## LENGUAJE PARA MANIPULACIÓN DE BASES DE DATOS RELACIONALES:
 [![N|sql](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHC2PgWBCh4ty3Ny-_YUhIc3RDZH8dcVAlYg&usqp=CAU)](https://www.sqlite.org/)
 
+## Conceptos Básicos
+
 ### Qué es SQL
 Estas son las siglas de _structured query language_ (lenguaje de consultas estructuradas) y básicamente es un lenguaje de programación que nos permite trabajar con bases de datos relacionales.
 
@@ -184,7 +186,7 @@ CREATE TABLE Persons (
 )
 ```
 
-Clave Foránea (Foreign key)
+### Clave Foránea (Foreign key)
 1. Una clave foránea es un campo (o una combinación de campos) en una tabla que establece una relación con la clave primaria de otra tabla, es decir hace referencia a una clave primaria de otra tabla; es decir: no puede ser una clave foránea si no esta haciendo referencia a una clave primaria de otra tabla. **ES UNA BUENA PRACTICA A UNA COLUMNA QUE VA A CONTENER UNA CLAVE FORANEA PONERLE EL MISMO NOMBRE DE LA COLUMNA A LA QUE VAMOS A HACER REFERENCIA.**
 Ejemplo: Si en una tabla usuarios tenemos la columna *id_usuarios* que es una clave primaria, y en otra tabla vamos a tener una columna pacientes, que en realidad es una columna foránea que va a contener ids de los usuarios, entonces no le ponemos pacientes sino **id_usuarios.**
 2. Se utiliza para vincular dos tablas entre sí y garantizar la integridad referencial de los datos
@@ -211,7 +213,8 @@ Al momento de crear ambas tablas, las relacionamos por las foreign keys, que ser
 
 ![tablas relacionadas](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/relacionTablas.jpg)
 Para hacer este diagrama usamos la herramienta [dbdiagram](https://dbdiagram.io/)
-Para generar esta imagen este fue el script usado
+Para generar esta imagen este fue el script usado:
+
 ```
 Project aprendiendo {
   database_type: 'sql lite'
@@ -234,7 +237,7 @@ Table turnos_medicos {
 }
 ```
 
-## Base de datos Northwind
+### Base de datos Northwind
 
 Para obtener una base de datos para poder trabajar usamos [Northwind](Northwind: https://cutt.ly/s44VsfF)
 
@@ -440,6 +443,7 @@ WHERE NOT Country = "USA"
 SELECT * FROM Customers
 WHERE NOT Country = "USA" AND NOT Country = "France"
 ```
+
 **Clausula LIMIT**
 La declaracioón **LIMIT** limita los resultados al numero que se ponga despues de escribir la palabra.
 
@@ -454,4 +458,143 @@ LIMIT 5
 ```
 
 **Operador BETWEEN**
+
+EL operador **BETWEEN** selecciona valores en un rango dado. Los valores pueden ser numeros, texto o fechas. El operador es inclusivo, eso significa que el valor del principio y el final seran incluidos.
+
+Sintaxis:
+
+```sql
+SELECT column_name(s)
+FROM table_name
+WHERE column_name BETWEEN value1 AND value2;
+```
+
+Ejemplos:
+
+```sql
+— Seleccioname todos los productos donde el precio este entre 20 y 40
+SELECT * FROM Products WHERE Price BETWEEN 20 AND 40;
+```
+
+```sql
+— Seleccioname todos los productos donde el precio
+— este entre 20 y 40 y la categoría del producto sea la 6
+SELECT * FROM Products WHERE Price BETWEEN 20 AND 40 AND CategoryID = 6
+```
+
+El operador between nos sirve tambien para seleccionar rangos de fechas
+
+```sql
+— Selecioname todos los empleados que hayan nacido entre 1960 hasta 1970
+SELECT * FROM Employees WHERE BirthDate BETWEEN "1960-0-1" AND "1970-0-1"
+```
+
+**Operador LIKE**
+
+El operador **LIKE** se utiliza para buscar por un determinado patron en una columna. Es como una expresión regular pero mas básica. LIKE y el operador = son exactamente iguales.
+
+Sintaxis:
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE columnN LIKE pattern;
+```
+
+Ejemplos:
+
+```sql
+-- Este ejemplo nos devuelve el registro que estemos buscando segun el nombre despues de LIKE
+SELECT * FROM Employees WHERE LastName LIKE "Fuller"
+```
+
+```sql
+-- Este ejemplo nos devuelve el registro que estemos buscando segun el LIKE, pero si escribimos "Fuller "
+-- con este espacio al final ya no funcionara
+SELECT * FROM Employees WHERE LastName LIKE "Fuller "
+```
+
+```sql
+-- Este ejemplo nos devuelve el registro que estemos buscando segun el LIKE
+-- La clausala LIKE funciona igual que un =
+SELECT * FROM Employees WHERE LastName = "Fuller"
+```
+
+ La diferencia entre _=_ y _LIKE_ es que LIKE es usualmente usado junto con dos comodines:
+
+- El signo de porcentage _%_ representa 0, 1 o mas caracteres, lo que significa que puede coincidir con cualquier secuencia de caracteres en la posición donde se encuentra.
+- El carácter de guión bajo *_* representa un solo carácter y solo uno. Y puede coincidir con cualquier carácter individual en la posición donde se encuentra. Es decir: el caracter _ hace referencia a cualquier cosa
+
+Veamos algunos ejemplos del uso de LIKE junto con sus comodines:
+
+```sql
+-- Seleccioname todos los registros de la tabla Employees donde el nombre tenga 4 letras y comience con una N, tenga un segundo caracter cualquiera y termine en ncy
+SELECT * FROM Employees WHERE FirstName LIKE "N_ncy"
+```
+
+```sql
+-- Seleccioname todos los registros de la tabla Employees donde el nombre comience con M y pueda tener cualquier numero de caracteres despues
+SELECT * FROM Employees WHERE FirstName LIKE "M%"
+```
+
+```sql
+-- Seleccioname todos los registros de la tabla Employees donde el nombre contenga una e y pueda tener cualquier numero de caracteres antes y despues
+SELECT * FROM Employees WHERE FirstName LIKE "%e%"
+```
+
+```sql
+-- Selecioname un nombre que empiece por a, tenga una letra después y luego contenga lo que sea
+SELECT * FROM Employees WHERE FirstName LIKE "A_%"
+```
+
+**Operadores IS NULL e IS NOT NULL**
+
+El operador **IS NULL** devuelve  solo los valores NULL de la  base de datos en caso de que existan.
+
+```sql
+-- Devuelve solo los valores nulos de la base de datos
+SELECT * FROM Products WHERE ProductName IS NULL
+ORDER BY ProductName ASC
+```
+
+Por el contrario el operador **IS NOT NULL** va a devolver todos los valores de la tabla excepto los null.
+
+```sql
+-- Devuelveme todos los datos de la tabla product menos los registros null
+SELECT * FROM Products WHERE ProductName IS NOT NULL
+ORDER BY ProductName ASC
+```
+
+**Operador IN**
+
+El operador **IN** en SQL se utiliza principalmente para realizar multiples comparaciones con una lista de valores. Permite verificar si un valor está presente en una lista de valores especificada. Es una abreviación de multiples condiciones **OR**. 
+
+Sintaxis:
+El formato basico de una consulta que utiliza el operador IN es esta:
+
+```sql
+SELECT column_name(s) 
+FROM table_name
+WHERE columna IN (valor1, valor2, ..., valorN);
+```
+
+> La clausula IN se puede usar en la clausula select, update y delete
+
+Ejemplos:
+
+```sql
+-- Devuelveme todos los supplier (proveedores) que tengan los identificadores 3, 4, 5, 6
+SELECT * FROM Products WHERE SupplierID IN (3, 4, 5, 6)
+```
+
+```sql
+-- Devuelveme todos los lastname que sean Fuller o Suyama
+SELECT * FROM Employees
+WHERE LastName in ("Fuller", "Suyama")
+```
+
+## SECCIÓN INTERMEDIA
+
+### Funciones de agregación
+
+
 
