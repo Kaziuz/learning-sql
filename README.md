@@ -297,4 +297,84 @@ La clausula **RANDOM** ordena las columnas de una tabla al azar.
 SELECT * FROM Products ORDEY BY random()
 ```
 
-**Clausula DISTINCT**
+**Clausula DISTINCT:**
+
+Se usa para que salgan los valores únicos de una columna.
+
+La sintaxis seria sta:
+
+```sql
+SELECT DISTINCT column1, column2, ...
+FROM table_name;
+```
+
+Entonces supongamos que para la columna product name se repiten algunos nombres de productos, entonces para que salgan los únicos nombres y no repetidos escribiriamos la clausula asi:
+
+```sql
+SELECT DISTINCT ProductName FROM Products;
+```
+
+**Clausula WHERE (CONDICIONES)**
+
+La cláusula **WHERE** es usada para filtrar registros. Es usada para extraer solo aquellos registros que cumplen una condición especifica.
+
+Sintaxis especifica:
+
+```sql
+SELECT column1, column2, ... FROM table_name WHERE condition;
+```
+> IMPORTANTE: no solo se usa **WHERE** con SELECT, tambien se usa con UPDATE, DELETE y otras maás.
+
+Ejemplos:
+
+```sql
+— Asi devolveria solo el campo
+SELECT ProductName from Products
+WHERE ProductID = 14
+```
+
+```sql
+— Asi devolveria el registro completo
+SELECT * FROM Products
+WHERE ProductID = 12
+```
+
+```sql
+— Muestrame todas las opciones que valgan menos de 40 dolares
+SELECT * FROM Products
+WHERE Price <= 40
+```
+
+```sql
+— Muestrame todos los productos que valgan mas de 40
+SELECT * FROM Products
+WHERE Price > 40
+```
+
+```sql
+— Para borrar un registro especifico
+DELETE from turnos_medicos
+WHERE id_turno = 16
+```
+
+**Clausula WHERE con UPDATE (CONDICIONES)**
+
+La clausula **UPDATE** es usada para modificar un registro existente en una tabla. Se usa en conjunto con la palabra clave **SET** que nos indica que escribamos el nombre de la columna con su nuevo valor
+
+Sintaxis:
+
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+```
+Ejemplo:
+
+```sql
+— para actualizar un campo especifico
+UPDATE turnos_medicos
+SET horario = "4:30 PM"
+WHERE id_turno = 15
+```
+
+
