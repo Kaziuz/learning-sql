@@ -377,4 +377,81 @@ SET horario = "4:30 PM"
 WHERE id_turno = 15
 ```
 
+**Operadores Logicos AND, OR Y NOT**
+
+La clausula **WHERE** contiene una serie de operadores que sirven para agregar logica al filtrado.
+
+El operador **AND** es utilizado para filtrar filas basadas en mas de una condicion. Devuelve verdadero si todas las condiciones son verdaderas.
+
+Sintaxis de AND
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition1 AND condition2 AND condition3 ...;
+```
+Ejemplo AND:
+
+```sql
+SELECT * from Customers
+WHERE CustomerID >= 50 AND CustomerID < 55
+```
+
+El operador lógico **OR** devuelve verdadero si cualquiera de las condiciones es verdadera.
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition1 OR condition2 OR condition3 ...;
+```
+
+Ejemplo OR:
+
+```sql
+SELECT * FROM Employees
+WHERE FirstName = "Nancy" OR FirstName = "Steven"
+```
+
+Ejemplo combinando AND y OR:
+```sql
+— Dame los productos que su precio sea menor a 20 o su categoría sea 6 y que si o si el proveedor sea 7
+SELECT * FROM Products
+WHERE (Price < 20 OR CategoryID = 6) AND SupplierID = 7
+```
+
+El operador lógico **NOT** invierte el valor de verdad de una condición. Es decir: se usa para negar una condicion. Si algo es true entonces lo vuelve false y visceversa.
+
+sintaxis:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE NOT condition;
+```
+
+Ejemplo:
+```sql
+— Muestrame todos los clientes menos los de usa
+SELECT * FROM Customers
+WHERE NOT Country = "USA"
+```
+
+```sql
+— Muestrame todos los clientes menos de lo de usa y los de Francia
+SELECT * FROM Customers
+WHERE NOT Country = "USA" AND NOT Country = "France"
+```
+**Clausula LIMIT**
+La declaracioón **LIMIT** limita los resultados al numero que se ponga despues de escribir la palabra.
+
+```sql
+-- Limitame los resultados a solo 5 registros
+SELECT * FROM Customers
+WHERE CustomerID >= 50
+AND NOT Country = "Germany"
+AND NOT Country = "USA"
+AND NOT Country = "Argentina"
+LIMIT 5
+```
+
+**Operador BETWEEN**
 
