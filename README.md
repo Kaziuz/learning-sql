@@ -895,3 +895,236 @@ Hay varios tipos de Join:
 - **Cross Join:** En este tipo de Join, todas las celdas se juntan con todas las celdas. Es decir todas las posibilidades se dan. Estamos multiplicando la cantidad de filas que hay en una columna por la cantidad de filas que hay en otra columna.
 
 ![crossJoin](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/crossJoin.jpg)
+
+> El cross join casi ni se usa.
+
+```sql
+-- Esta consulta sql es un crosjoin:
+SELECT * FROM Employees e, Orders o
+```
+
+### Clausula INNER JOIN
+
+Devuelve la coincidencias entre las tablas, se usa la clausula ON que es la condición para la union de las tablas. Es decir: selecciona las filas que tienen coincidencias entre ambas tablas.
+
+![Inner join](https://static.javatpoint.com/sqlpages/images/sql-inner-join.png)
+
+ejemplos de consulta sql usando inner join:
+
+```sql
+SELECT * FROM Employees e
+INNER JOIN Orders o ON e.EmployeeID = o.EmployeeID
+```
+
+```sql
+SELECT LastName, FirstName, OrderID FROM Employees e
+INNER JOIN Orders o ON e.EmployeeID = o.EmployeeID
+```
+
+```sql
+— Muestra los empleados que han ganado una recompensa
+SELECT FirstName, Reward, Month FROM Employees e
+INNER JOIN Rewards r ON e.EmployeeID = r.EmployeeID
+```
+
+### Clausula LEFT JOIN
+
+El **LEFT JOIN** retorna todos los registros de la tabla izquierda (tabla1) con los registros que coincidan de la tabla de la derecha (tabla2). Es decir: el Left join nos devuelve la tabla de la izquierda con parte de la tabla de la derecha.
+El resultado sera 0 filas desde el lado derecho si no hay coincidencias.
+
+![left join](https://www.w3schools.com/sql/img_left_join.png)
+
+Sintaxis:
+
+```sql
+SELECT column_name(s)
+FROM table1
+LEFT JOIN table2
+ON table1.column_name = table2.column_name;
+```
+
+Ejemplo:
+
+```sql
+SELECT FirstName, Reward, Month FROM Employees e
+LEFT JOIN Rewards r on e.EmployeeID = r.EmployeeID
+```
+
+### Clausula RIGHT JOIN
+
+El **RIGHT JOIN** retorna todos los registros de la tabla de la derecha (table2) con los registros que coincidan con la tabla de la izquierda(table1). Es decir: Devuelve toda la tabla de la derecha con parte De la tabla de la izquierda.
+El resultado sera 0 filas desde la tabla de la derecha si no hay coincidencias
+
+![rightjoin](https://www.w3schools.com/sql/img_right_join.png)
+
+Sintaxis:
+
+```sql
+SELECT column_name(s)
+FROM table1
+RIGHT JOIN table2
+ON table1.column_name = table2.column_name;
+```
+
+> En sql lite no se puede hacer **right join**, por eso entonces invertimos las tablas para que al hacer left join, se haga un right join
+
+```sql
+-- Ejemplo de simulación right join invirtiendo las tablas rewards y employees
+SELECT FirstName, Reward, Month FROM Rewards r
+LEFT JOIN Employees e on e.EmployeeID = r.EmployeeID
+```
+
+### Operador UNION
+
+El operador **UNION** es usado para combinar el conjunto resultante  de dos o mas cláusulas **SELECT** (es decir: de una consulta con otra consulta). Si se repiten filas, solo las muestra una vez.
+
+El operador **UNION** selecciona solo valores distintos de forma predeterminada. Para permitir valores duplicados, se usa **UNION ALL**
+
+![unionoperator](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/union.jpg)
+
+- Cada declaracion **SELECT** dentro de **UNION** debe tener la misma cantidad de columnas
+- Las columnas deben de tener los mismos tipos de datos
+
+Sintaxis:
+
+```sql
+SELECT column_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2;
+```
+
+```sql
+SELECT column_name(s) FROM table1
+UNION ALL
+SELECT column_name(s) FROM table2;
+```
+
+Ejemplo real:
+
+```sql
+-- Simulando un full join uniendo un left join con una simulación de right join
+SELECT FirstName, Reward, Month FROM Employees e
+LEFT JOIN Rewards r on e.EmployeeID = r.EmployeeID
+UNION
+-- Ejemplo de simulación right join invirtiendo las tablas rewards y employees
+SELECT FirstName, Reward, Month FROM Rewards r
+LEFT JOIN Employees e on e.EmployeeID = r.EmployeeID
+```
+
+### CARDINALIDAD
+
+En el contexto de bases de datos la cardinalidad se utiliza para especificar cuál es la relación que hay entre dos entidades. (tablas)
+
+Entonces normalmente y la forma mas común de relacionarse las tablas es por las **foreing keys**. Entonces la cardinalidad nos describe como se relacionan estas claves.
+
+**Existen 4 tipos de cadinalidades:**
+
+- **Uno a uno (1:1):** Una fila de una tabla se relaciona exactamente con 1 y solamente 1 fila de otra tabla. Por ejemplo: Cada persona tiene un único pasaporte y cada pasaporte pertenece a una única persona.
+- **Uno a muchos (1: n) o muchos a uno (n:1):** Una fila de una tabla puede relacionarse con una o varias filas en otra tabla. Por ejemplo:
+Tenemos una tabla autores y otra tabla libros. Un autor pueden haber escrito varios libros.
+- **Muchos a muchos (n:m):** Varias filas de una tabla se relacionan con varios filas en otra tabla o viceversa. Ejemplo: Tenemos una tabla estudiantes y otra tabla cursos. Un estudiante puede tener varios cursos pero a su vez, un curso puede ser tomado por varios estudiantes. Para este tipo de relaciones se maneja una tabla intermedia para manejar las relaciones. En este caso del ejemplo creamos una tabla inscripciones como se ve en la imagen.
+
+![cardinalidad](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/cardinalidad.jpg)
+
+### Normalización de las bases de datos
+
+La normalización en bases de datos es un proceso utilizado para organizar datos de manera eficiente y reducir la redundancia y la inconsistencia en las bases de datos relacionales. El objetivo principal de la normalización es eliminar las anomalías de inserción, actualización y eliminación que pueden surgir cuando los datos se almacenan en una estructura no normalizada.
+
+Existen varias formas normales (1NF, 2NF, 3NF, entre otras) que se utilizan para estructurar y optimizar las bases de datos. A continuación, te explico las principales formas normales y sus características:
+
+**Primera Forma Normal (1NF)**
+Para cumplir con la Primera Forma Normal (1NF), una tabla debe cumplir con las siguientes condiciones:
+
+- Todos los valores en una columna deben ser del mismo tipo de datos.
+- Cada columna debe tener un nombre único.
+- Cada registro debe ser único y tener un identificador único (una clave primaria).
+
+**Segunda Forma Normal (2NF)**
+Una tabla está en la Segunda Forma Normal (2NF) si cumple con las condiciones de la 1NF y además:
+
+- Elimina la redundancia de datos al asegurarse de que todos los atributos no clave dependan completamente de la clave primaria.
+
+**Tercera Forma Normal (3NF)**
+Una tabla está en la Tercera Forma Normal (3NF) si cumple con las condiciones de la 2NF y además:
+
+- Elimina la redundancia de datos al asegurarse de que no haya dependencias transitivas entre los atributos no clave.
+
+### Clausula INDEX (Indices)
+
+Los indices se crean con la finalidad de recuperar datos desde las bases de datos mas rapidamente que de otra forma, es decir: los usuarios no ven los indices, solo son usados para mejorar el rendimiento de busqueda.
+
+**Sintaxis para indices con campos duplicados:**
+
+```sql
+CREATE INDEX index_name
+ON table_name (column1, column2, ...);
+```
+
+Ejemplo:
+
+```sql
+-- Esto crea un indice que nos permite campos duplicados
+CREATE INDEX nombre ON Products (ProductName);
+-- Donde nombre es el nombre del indice, después del ON va el nombre de la tabla y entre () va el nombre de la columna
+```
+
+**Sintaxis para indice único:**
+
+```sql
+CREATE UNIQUE INDEX index_name
+ON table_name (column1, column2, ...);
+```
+
+Ejemplo
+
+```sql
+CREATE UNIQUE INDEX name ON Employees (FirstName, LastName)
+```
+
+En este ejemplo el indice se crea compuestamente porque se ponen como columnas el nombre y el apellido. Esto es con la finalidad de que alguien no pueda llamarse dos veces con el mismo nombre. (Es solo para ejemplificar)
+
+> El ejemplo anterior crea un indice que es unico, en el cual los campos no se pueden repetir, **por ejemplo para guardar correos o nombres de usuarios seria excelente**.
+
+Para borrar los indices seria: 
+```sql
+DROP INDEX name;
+```
+
+### VISTAS (VIEWS)
+
+En SQL, una vista es un tabla virtual basada en los resultados de una clausula SQL. Una vista contiene filas y columnas como una tabla real. Se almacenan como objetos en las bases de datos. Para crear una vista se usa la clausula **CREATE VIEW**
+
+sintaxis:
+
+```sql
+CREATE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+```
+
+Ejemplos:
+
+```sql
+-- Creando una vista de la tabla Products
+CREATE VIEW Productos_simplificados AS
+SELECT ProductID, ProductName, Price FROM Products
+WHERE ProductID > 20
+ORDER BY ProductID DESC
+```
+
+```sql
+-- Luego podemos llamar la view como si fuera una tabla
+SELECT * FROM Productos_simplificados
+```
+
+```sql
+-- Para eliminar una view escribimos el siguiente comando
+DROP VIEW IF EXISTS Productos_simplificados
+```
+
+## SECCIÓN AVANZADA
+
+### Bloqueos y transacciones
+
+
