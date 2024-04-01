@@ -596,5 +596,302 @@ WHERE LastName in ("Fuller", "Suyama")
 
 ### Funciones de agregación
 
+Una función de agregación es una funcion que ejecuta un calculo en un grupo de valores y retorna un unico valor. Las funciones de agregacion normalmente son usadas con la clausula **GROUP BY** de la declaración **SELECT**. La clausula **GROUP BY** divide el conjunto de resultados en grupos de valores y las funciones de agregación pueden ser usadas para regresar un solo valor por cada grupo. Las funciones de agregación ignoran los valores NULL excepto **COUNT()**.
+
+Las funciones de agregacion mas utilizadas son:
+
+- **MIN()** - Devuelve el valor mas pequeño dentro de la columna seleccionada
+- **MAX()** - Devuelve el valor mas grande dentro de la columna seleccionada
+- **COUNT()** - Devuelve el nuúmero de filas | registros en el conjunto
+- **SUM()** - Devuelve la suma de una columna numerica
+- **AVG()** - Devuelve el promedio de una columna numerica
+- **ROUND()** - Redondea un numero a un especifico numero de partes decimales
+
+Ejemplos:
+
+```sql
+-- Cuantos empleados hay: esto hace una cuenta de cuantos registros tiene la tabla Employees
+SELECT count(LastName) AS Cantidad_de_nombres FROM Employees
+```
+
+```sql
+-- Sumar todos los precios de la tabla products
+SELECT SUM(Price) from Products
+```
+
+```sql
+-- Dame el promedio del precio de los productos
+SELECT AVG(Price) from Products
+```
+
+```sql
+-- Dame el promedio del precio de los productos y redondea el valor final
+SELECT ROUND(avg(Price)) from Products
+```
+
+```sql
+-- Dame el promedio del precio de los productos, redondea el valor final y ponle un alias a la columna price
+SELECT ROUND(avg(Price)) AS Promedio from Products
+```
+
+```sql
+-- Dame el promedio del precio de los productos y redondea el valor final con 2 decimales y ponle un alias a la columna price
+SELECT ROUND(avg(Price), 2) AS Promedio from Products
+```
+
+```sql
+-- Cual es el precio minimo que tiene la columna price exeptuando los null
+SELECT MIN(Price) FROM Products
+where ProductName IS NOT NULL
+```
+
+```sql
+-- Estoy obteniendo el producto con menor precio exeptuando los null
+SELECT ProductName, MIN(Price) FROM Products
+where ProductName IS NOT NULL
+```
+
+```sql
+-- Estoy obteniendo el producto con el maximo precio exeptuando los null
+SELECT ProductName, max(Price) FROM Products
+```
+
+### Clausula GROUP BY
+
+La instrucción **GROUP BY** agrupa filas que tienen los mismos valores en las filas que resumen. Es decir: hace un conteo de cuantos registros hay por la fila que se este agrupando.
+
+La declaración GROUP BY es usado normalmente con funciones de agregación (COUNT(), MAX(), MIN(), SUM(), AVG()) para agrupar los resultados en una o mas columnas.
+
+![groupby](https://www.programiz.com/sites/tutorial2program/files/sql-group-by.png)
+
+En la imagen anterior usando la clausula group by, se devuelve una nueva tabla con el total de clientes por pais.
+
+Sintaxis:
+
+```sql
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+ORDER BY column_name(s);
+```
+
+Ejemplos:
+
+```sql
+-- Dame el promedio de cada proveedor
+SELECT SupplierID, ROUND(avg(price)) AS promedio FROM Products GROUP BY SupplierID
+```
+
+```sql
+-- Dame el promedio de cada proveedor menos los valores que sean null
+-- Entonces lo que estamos viendo es el promedio del costo de cada categoria
+SELECT CategoryID, ROUND(avg(price)) AS promedio FROM products
+WHERE CategoryID IS NOT NULL
+GROUP BY CategoryID
+```
+
+```sql
+-- Cual fue el producto que mas se vendio
+SELECT ProductID, SUM(Quantity) as Total from OrderDetails
+GROUP BY ProductID
+ORDER BY Total DESC
+LIMIT 1
+```
+
+```sql
+-- Cual fue el producto que menos se vendio
+SELECT ProductID, SUM(Quantity) as Total from OrderDetails
+GROUP BY ProductID
+ORDER BY Total ASC
+LIMIT 1
+```
+
+### Clausula HAVING
+
+La clausula **HAVING** fue añadida a SQL porque con la palabra clave **WHERE** no podemos usar funciones de agregación. Entonces, con WHERE podemos filtrar registros, con HAVING podemos filtrar grupos.
+
+Sintaxis:
+
+```sql
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+HAVING condition
+ORDER BY column_name(s);
+```
+
+Ejemplos:
+
+```sql
+-- Dame el promedio de cada proveedor menos los valores que sean null
+-- Entonces lo que estamos viendo es el promedio del costo de cada categoria
+SELECT SupplierID, ROUND(avg(price)) AS promedio FROM products
+GROUP BY SupplierID
+HAVING promedio > 40
+```
+
+```sql
+-- Dame cuantas veces se vendio un producto y solo los que se vendieron mas de 50 veces
+SELECT ProductID, SUM(Quantity) as Total from OrderDetails
+GROUP BY ProductID
+HAVING Total > 50
+```
+
+La jerarquía para el query seria asi:
+
+> Primero siempre se selecciona (SELECT)
+Luego hacemos el filtro (WHERE)
+Luego seguiría agrupar registros (GROUP BY)
+Luego seguiria usar el (HAVING), que solo se usa para los grupos
+
+```sql
+SELECT…. FROM …
+WHERE …
+GROUP BY …
+HAVING …
+ORDER BY …
+LIMIT …
+```
+
+## Subconsultas
+
+Como su nombre lo indica, una subconsulta es una consulta que esta dentro de una consulta. Es decir: una consulta anidada dentro de una consulta más grande. 
+
+Ejecutan una consulta pequeña y con el resultado de esa mini consulta, ejecutan otra consulta que es la principal. Las subconsultas **SIEMPRE** tienen que ser un select, algo que recupera datos: entonces, **las subconsultas siempre consultan la base de datos, no la alteran**
+Las subconsultas siempre van (entre parentesis)
+
+![subquery](https://www.mariadbtutorial.com/wp-content/uploads/2019/10/MariaDB-subqueries.png)
+
+Ejemplo básico:
+
+```sql
+-- Seleccioname de la tabla OrderDetails el productID y la cantidad que se vendio (Quantity)
+-- en la subconsulta, ahora seleccioname el productName de la tabla products,
+-- donde el productId de la tabla OrderDetails sea igual al ProductID de la tabla products
+
+SELECT
+	ProductID,
+	Quantity,
+	(SELECT ProductName from Products WHERE OrderDetails.ProductID = ProductID) As ProductName -- Esta es la subconsulta
+	from OrderDetails
+```
 
 
+La consulta anterior es igual a esto:
+
+```sql
+SELECT
+	ProductID,
+	Quantity,
+	(SELECT ProductName from Products WHERE OD.ProductID = ProductID) As ProductName -- Esta es la subconsulta
+	from OrderDetails AS OD 
+```
+Más ejemplos:
+
+```sql
+-- Seleccionamos ProductID y Quantity de la tabla OrderDetails con sobrenombre OD
+-- creamos la columna ProductName a partir de la tabla products y OrderDetails
+-- creamos la columna precio unitario a partir de la tabla Products y OrderDetails
+SELECT
+	ProductID,
+	Quantity,
+	(SELECT ProductName from Products WHERE OD.ProductID = ProductID) As ProductName, -- Esta es la subconsulta1
+	(SELECT price from Products where OD.ProductID = ProductID) as PrecioUnitario -- Esta es la subconsulta2
+	from [OrderDetails] OD
+```
+
+```sql
+-- Seleccionamos ProductID y sumamos el total de cantidades vendidas,
+-- creamos la columna ProductName a partir de la tabla products y OrderDetails
+-- creamos la columna precioXunidad a partir de la tabla Products y OrderDetails
+-- ahora creamos la columna totalRecaudado que sale de multiplicar el total_vendido_X_unidad + el precio por unidad
+-- Agrupamos por ProductID para que puedan salir los totales recaudados por categoria
+
+SELECT ProductID, SUM(Quantity) as total_vendido_X_unidad,
+	(SELECT ProductName from Products WHERE OD.ProductID = ProductID) As ProductName, -- Esta es la subconsulta1
+	(SELECT Price from Products where OD.ProductID = ProductID) as PrecioXUnidad, -- Esta es la subconsulta2
+	(SUM(Quantity) * (SELECT Price FROM Products WHERE OD.ProductID = ProductID)) as totalRecaudado -- Esta es la subconsulta3
+	FROM [OrderDetails] OD
+GROUP BY ProductID 
+```
+
+```sql
+SELECT ProductID, SUM(Quantity) as totalVendidoXunidad,
+(SELECT ProductName from Products WHERE OD.ProductID = ProductID) as ProductName,
+(SELECT Price from Products WHERE OD.ProductID = ProductID) as PrecioXunidad,
+round(SUM(Quantity) * (SELECT Price FROM Products WHERE OD.ProductID = ProductID)) as total_recaudado
+FROM [OrderDetails] OD
+GROUP BY ProductID
+ORDER BY total_recaudado DESC
+```
+
+```sql
+-- Aqui usamos una subconsulta para seleccionar solo los productos resultantes de la subconsulta price > 40
+SELECT ProductID, SUM(Quantity) as totalVendidoXunidad,
+(SELECT ProductName from Products WHERE OD.ProductID = ProductID) as ProductName,
+round(SUM(Quantity) * (SELECT Price FROM Products WHERE OD.ProductID = ProductID)) as total_recaudado
+FROM [OrderDetails] OD
+WHERE (SELECT Price from Products WHERE OD.ProductID = ProductID) > 40
+GROUP BY ProductID
+ORDER BY total_recaudado DESC
+```
+
+```sql
+-- Las subconsultas tambien pueden ser usadas con from
+SELECT ProductName FROM (
+	SELECT ProductID, SUM(Quantity) as totalVendidoXunidad,
+	(SELECT ProductName from Products WHERE OD.ProductID = ProductID) as ProductName,
+	round(SUM(Quantity) * (SELECT Price FROM Products WHERE OD.ProductID = ProductID)) as total_recaudado
+	FROM [OrderDetails] OD
+	WHERE (SELECT Price from Products WHERE OD.ProductID = ProductID) > 40
+	GROUP BY ProductID
+	ORDER BY total_recaudado DESC
+)
+```
+
+```sql
+-- Las subconsultas tambien pueden ser usadas con from,
+-- Esta tabla creada no esta en ninguna parte, la hemos creado juntando varios datos
+-- ahora podemos pedir las columnas y tambien poderlas filtrar
+SELECT ProductName, total_recaudado FROM (
+	SELECT ProductID, SUM(Quantity) as totalVendidoXunidad,
+	(SELECT ProductName from Products WHERE OD.ProductID = ProductID) as ProductName,
+	round(SUM(Quantity) * (SELECT Price FROM Products WHERE OD.ProductID = ProductID)) as total_recaudado
+	FROM [OrderDetails] OD
+	WHERE (SELECT Price from Products WHERE OD.ProductID = ProductID) > 40
+	GROUP BY ProductID
+	ORDER BY total_recaudado DESC
+) where total_recaudado > 100
+```
+
+```sql
+-- Obtenemos los empleados que vendieron mas que el promedio
+-- Selecciona el nombre y apellido de los empleados
+SELECT FirstName,LastName,
+-- Subconsulta para calcular la suma total de las unidades de los pedidos de cada empleado
+(SELECT SUM(od.Quantity) FROM [orders] o, [OrderDetails] od
+WHERE o.EmployeeID = e.EmployeeID AND od.OrderID = o.OrderID) as unidades_totales 
+FROM [Employees] e
+-- Filtra los empleados que tienen un total de unidades menor que el promedio de unidades totales de todos los empleados
+WHERE unidades_totales < (SELECT AVG(unidades_totales)
+-- Subconsulta para calcular la suma total de las unidades de los pedidos de cada empleado
+FROM (
+SELECT (SELECT SUM(od.Quantity) FROM [orders] o, [OrderDetails] od
+WHERE o.EmployeeID = e2.EmployeeID AND od.OrderID = o.OrderID) as unidades_totales
+FROM [Employees] e2
+GROUP BY e2.EmployeeID
+))
+```
+
+### JOINS
+
+Los **Joins** en SQL son una forma de combinar filas de dos o más tablas, basadas en una columna relacionada entre ellas y posteriormente mostrar una sola tabla.
+La cláusula Join te permite recuperar datos de varias tablas basándote en un campo común entre ellas.
+
+Hay varios tipos de Join:
+
+- **Cross Join:** En este tipo de Join, todas las celdas se juntan con todas las celdas. Es decir todas las posibilidades se dan. Estamos multiplicando la cantidad de filas que hay en una columna por la cantidad de filas que hay en otra columna.
+
+![crossJoin](https://raw.githubusercontent.com/Kaziuz/learning-sql/main/photos/crossJoin.jpg)
