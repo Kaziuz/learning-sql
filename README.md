@@ -1127,4 +1127,83 @@ DROP VIEW IF EXISTS Productos_simplificados
 
 ### Bloqueos y transacciones
 
+Estos conceptos están relacionados con el control de concurrencia en bases de datos, específicamente con los bloqueos (locks) que se utilizan para garantizar la consistencia y la integridad de los datos cuando múltiples usuarios o procesos acceden a la base de datos simultáneamente.
 
+- **Shared Locks (Bloqueos compartidos):** Un bloqueo compartido (shared lock) permite que varios usuarios o procesos puedan leer un recurso (como una fila o una página) al mismo tiempo, pero ninguno de ellos podrá modificarlo hasta que el bloqueo se libere. Es decir, múltiples bloqueos compartidos pueden coexistir al mismo tiempo, pero un bloqueo compartido no puede coexistir con un bloqueo de escritura (exclusive lock).
+
+- **Read Locks (Bloqueos de lectura):** Un bloqueo de lectura (read lock) es similar al bloqueo compartido, pero es más específico en el sentido de que se utiliza exclusivamente para operaciones de lectura. Permite que múltiples usuarios o procesos lean un recurso al mismo tiempo, pero impide que otros usuarios o procesos lo modifiquen hasta que el bloqueo se libere. Es útil cuando se necesita garantizar que los datos no cambien mientras se están leyendo.
+
+- **Reserved Locks (Bloqueos reservados):** Un bloqueo reservado (reserved lock) se utiliza cuando se desea realizar una operación de escritura (como insertar, actualizar o eliminar) en un recurso. Este tipo de bloqueo se obtiene antes de realizar la operación de escritura para garantizar que ningún otro usuario o proceso pueda leer o escribir en el recurso mientras se está realizando la operación de escritura. Una vez que se ha obtenido el bloqueo reservado, se puede convertir en un bloqueo exclusivo (exclusive lock) para realizar la operación de escritura, o se puede liberar si la operación no se lleva a cabo.
+
+- **Exclusive locks (Bloqueos esclusivos):** La persona no puede leer ni escribir en la db.
+- 
+Estos bloqueos son fundamentales para mantener la integridad de los datos en entornos multiusuario, ya que garantizan que las operaciones se realicen de manera ordenada y controlada, evitando condiciones de carrera, conflictos y corrupción de datos. Sin embargo, es importante utilizarlos de manera adecuada y eficiente para evitar problemas de rendimiento y bloqueos innecesarios que puedan afectar el rendimiento y la disponibilidad de la base de datos.
+
+### Transacciones
+
+Existen tres metodos que son usados para saval o cancelar los cambios hechos por una clausula SQL hacia la base de datos:
+
+**BEGIN (Comenzar una transacción)**
+
+BEGIN se utiliza para iniciar una transacción en SQL. Una transacción es un conjunto de operaciones que se ejecutan como una unidad completa. Si alguna de las operaciones dentro de la transacción falla, se pueden revertir todas las operaciones anteriores con un ROLLBACK.
+
+Ejemplo:
+Supongamos que tenemos una tabla llamada empleados y queremos actualizar el salario de dos empleados al mismo tiempo. Si ocurre un error al actualizar el segundo salario, no queremos que se aplique la actualización al primero.
+
+```sql
+BEGIN TRANSACTION;
+
+UPDATE empleados SET salario = salario * 1.1 WHERE id_empleado = 1;
+-- Aquí puede ir algún código adicional o más operaciones SQL
+UPDATE empleados SET salario = salario * 1.1 WHERE id_empleado = 2;
+COMMIT;
+```
+
+**COMMIT (Confirmar una transacción)**
+
+COMMIT se utiliza para confirmar todas las operaciones dentro de una transacción. Una vez que ejecutamos COMMIT, todas las operaciones dentro de la transacción se aplicarán de manera permanente a la base de datos.
+
+Ejemplo:
+Siguiendo con el ejemplo anterior, después de asegurarnos de que ambas actualizaciones de salario se hayan realizado con éxito, confirmamos la transacción con COMMIT.
+
+```sql
+COMMIT;
+```
+
+**ROLLBACK (Revertir una transacción)**
+
+ROLLBACK se utiliza para revertir todas las operaciones dentro de una transacción que aún no se han confirmado con COMMIT. Si ocurre un error o si queremos cancelar todas las operaciones de la transacción, podemos usar ROLLBACK para hacerlo.
+
+Ejemplo:
+Siguiendo con el ejemplo anterior, si ocurre un error al actualizar el segundo salario y decidimos cancelar todas las operaciones, podemos hacerlo con ROLLBACK.
+
+```sql
+ROLLBACK;
+```
+En resumen:
+
+**BEGIN** inicia una transacción.
+**COMMIT** confirma y aplica todas las operaciones de una transacción.
+**ROLLBACK** revierte y cancela todas las operaciones de una transacción que aún no se han confirmado.
+
+Es importante mencionar que las transacciones son útiles para asegurar la integridad de los datos y para manejar situaciones donde necesitamos garantizar que un conjunto de operaciones se realice de manera completa y exitosa.
+
+### PROCEDIMIENTOS ALMACENADOS
+
+Es un conjunto de comandos que se guardan en la base de datos y podemos invocar despues (Yo lo entiendo como para evitar repetir codigo). SQL lite no lo soporta pero igual lo veremos.
+
+sintax; Asi creamos el procedimiento:
+```sql
+CREATE PROCEDURE procedure_name
+AS
+sql_statement
+GO;
+```
+
+Luego para ejecutar el procedimiento:
+
+```sql
+EXEC procedure_name;
+```
+
+## Hasta aqui ha llegado la documentación.
