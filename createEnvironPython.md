@@ -12,17 +12,17 @@ python3 -m venv <nombredelentorno>
 source nombredelentorno/bin/activate
 ```
 
-2.3 Instalamos paquetes si los necesitamos:
+- Instalamos paquetes si los necesitamos:
 ```sh
 pip3 install paquete_que_deseas_instalar
 ```
 
-4. Luego instalamos pipx, pipx es una herramienta que nos permite instalar y ejecutar paquetes de Python en entornos virtuales y gestionará esos entornos virtuales automáticamente por nosotros.Podemos instalar pipx utilizando pip:
+- Luego instalamos pipx, pipx es una herramienta que nos permite instalar y ejecutar paquetes de Python en entornos virtuales y gestionará esos entornos virtuales automáticamente por nosotros.Podemos instalar pipx utilizando pip:
 ```sh
 pip install pipx
 ```
 
-6. Si queremos descativar el entorno simplemente escribimos:
+- Si queremos descativar el entorno simplemente escribimos:
 ```sh
 deactivate
 ```
